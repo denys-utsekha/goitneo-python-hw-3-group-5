@@ -20,10 +20,8 @@ PERIOD = 7
 def get_birthdays_per_week(users):
     result = defaultdict(list)
     today = datetime.today().date()
-    print(f"tye - {type(users)}")
-    print(f"users - {users}")
+
     for user in users:
-        print(f"user - {user}")
         name = user["name"]
         birthday = user["birthday"].date()
         birthday_this_year = birthday.replace(year=today.year)
