@@ -61,7 +61,6 @@ class Name(Field):
         if self.__is_valid(name):
             super().__init__(name)
         else:
-            super().__init__(None)
             raise ValueError(f"{name} is invalid name")
 
 
@@ -81,7 +80,6 @@ class Phone(Field):
         if self.__is_valid(phone):
             super().__init__(phone)
         else:
-            super().__init__(None)
             raise ValueError(f"{phone} is invalid phone")
 
 
@@ -122,7 +120,7 @@ class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.birthday = None
-        self.phones = []
+        self.phone = None
 
     @handle_error
     def add_birthday(self, date):
@@ -130,37 +128,12 @@ class Record:
 
     @handle_error
     def add_phone(self, phone):
-        if self.find_phone(phone):
-            raise PhoneAlreadyExistError
-        self.phones.append(Phone(phone))
-
-    @handle_error
-    def remove_phone(self, phone):
-        if not self.find_phone(phone):
-            raise PhoneNotExistError
-        self.phones = list(
-            filter(lambda current_phone: current_phone.value != phone, self.phones)
-        )
-
-    @handle_error
-    def edit_phone(self, old_phone, new_phone):
-        if not self.find_phone(old_phone):
-            raise PhoneNotExistError
-        self.phones = list(
-            map(
-                lambda current_phone: current_phone
-                if current_phone.value != old_phone
-                else Phone(new_phone),
-                self.phones,
-            )
-        )
-
-    def find_phone(self, search_phone):
-        result = list(filter(lambda phone: phone.value == search_phone, self.phones))
-        return result[0] if len(result) else None
+        self.phone = Phone(phone)
 
     def __str__(self):
-        return f"Contact name: {self.name}, phones: {'; '.join(p.value for p in self.phones)}, birthday: {self.birthday}"
+        return (
+            f"Contact name: {self.name}, phone: {self.phone}, birthday: {self.birthday}"
+        )
 
 
 class AddressBook(UserDict):
@@ -169,13 +142,10 @@ class AddressBook(UserDict):
         if record.name.value in self.data:
             raise RecordAlreadyExistError
         self.data[record.name.value] = record
+        return self.data[record.name.value]
 
     @handle_error
     def find(self, name):
         if not self.data[name]:
             raise RecordNotExistError
         return self.data[name]
-
-    @handle_error
-    def delete(self, name):
-        del self.data[name]

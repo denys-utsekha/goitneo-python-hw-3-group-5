@@ -12,8 +12,33 @@ def add_contact(args, book):
     name, phone = args
     new_contact = Record(name)
     new_contact.add_phone(phone)
-    book.add_record(new_contact)
-    return "Contact added."
+    new_record = book.add_record(new_contact)
+    if new_record:
+        return "Contact added."
+
+
+def change_contact(args, book):
+    name, phone = args
+    contact = book.find(name)
+    if contact:
+        contact.add_phone(phone)
+        return "Contact changed."
+
+
+def get_contact_phone(args, book):
+    name = args[0]
+    contact = book.find(name)
+    if contact:
+        return book.find(name).phone
+
+
+def get_all_contacts(book):
+    result = ""
+    for name in book.keys():
+        result += f"{name}: {book[name].phone}\n"
+    if len(result) > 0:
+        return result[0:-1]
+    return "The contact list is empty"
 
 
 def add_birthday(args, book):
@@ -23,23 +48,12 @@ def add_birthday(args, book):
     return "Birthday added."
 
 
-def change_contact(args, book):
-    name, phone = args
-    contact = book.find(name)
-    contact.edit_phone(contact.phones[0], phone)
-    return "Contact changed."
-
-
-def get_contact_phone(args, book):
+def show_birthday(args, book):
     name = args[0]
-    return book.find(name).phones[0]
-
-
-def get_all_contacts(book):
-    result = ""
-    for name in book.keys():
-        result += f"{name}: {book[name].phones[0]}\n"
-    return result[0:-1]
+    if not book.find(name) or book.find(name).birthday == None:
+        return "Birthday is not defined"
+    birthday = book.find(name).birthday.value
+    return f"{birthday.day}.{birthday.month}.{birthday.year}"
 
 
 def get_birthdays(book):
@@ -47,14 +61,6 @@ def get_birthdays(book):
     for name in book.keys():
         data.append({"name": name, "birthday": book[name].birthday.value})
     get_birthdays_per_week(data)
-
-
-def show_birthday(args, book):
-    name = args[0]
-    if not book.find(name) or book.find(name).birthday == None:
-        return "Birthday is not defined"
-    birthday = book.find(name).birthday.value
-    return f"{birthday.day}.{birthday.month}.{birthday.year}"
 
 
 def main():
