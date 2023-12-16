@@ -104,13 +104,17 @@ class Birthday(Field):
     def date(self, date: str):
         if self.__is_valid(date):
             splitted = date.split(".")
-            super().__init__(
-                datetime(
-                    year=int(splitted[2]), day=int(splitted[1]), month=int(splitted[0])
+            try:
+                super().__init__(
+                    datetime(
+                        year=int(splitted[2]),
+                        day=int(splitted[1]),
+                        month=int(splitted[0]),
+                    )
                 )
-            )
+            except:
+                raise ValueError(f"{date} is invalid date")
         else:
-            super().__init__(None)
             raise ValueError(f"{date} is invalid date")
 
 
@@ -168,6 +172,8 @@ class AddressBook(UserDict):
 
     @handle_error
     def find(self, name):
+        if not self.data[name]:
+            raise RecordNotExistError
         return self.data[name]
 
     @handle_error

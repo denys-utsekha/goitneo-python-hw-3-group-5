@@ -49,6 +49,14 @@ def get_birthdays(book):
     get_birthdays_per_week(data)
 
 
+def show_birthday(args, book):
+    name = args[0]
+    if not book.find(name) or book.find(name).birthday == None:
+        return "Birthday is not defined"
+    birthday = book.find(name).birthday.value
+    return f"{birthday.day}.{birthday.month}.{birthday.year}"
+
+
 def main():
     book = AddressBook()
     print("Welcome to the assistant bot!")
@@ -71,6 +79,8 @@ def main():
             print(get_all_contacts(book))
         elif command == "add-birthday":
             print(add_birthday(args, book))
+        elif command == "show-birthday":
+            print(show_birthday(args, book))
         elif command == "birthdays":
             print(get_birthdays(book))
         else:
