@@ -1,40 +1,8 @@
 from collections import UserDict
 from datetime import datetime
 import re
-
-
-class PhoneAlreadyExistError(Exception):
-    pass
-
-
-class RecordAlreadyExistError(Exception):
-    pass
-
-
-class RecordNotExistError(Exception):
-    pass
-
-
-class PhoneNotExistError(Exception):
-    pass
-
-
-def handle_error(func):
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except PhoneAlreadyExistError:
-            print("Such a phone already exists")
-        except PhoneNotExistError:
-            print("There is no such phone.")
-        except RecordAlreadyExistError:
-            print("A record with this name already exists.")
-        except RecordNotExistError:
-            print("No such record found.")
-        except KeyError:
-            print("Nothing was found for this key.")
-
-    return inner
+from get_birthdays import get_birthdays
+import calendar
 
 
 class Field:
@@ -105,9 +73,9 @@ class Birthday(Field):
             try:
                 super().__init__(
                     datetime(
+                        day=int(splitted[0]),
+                        month=int(splitted[1]),
                         year=int(splitted[2]),
-                        day=int(splitted[1]),
-                        month=int(splitted[0]),
                     )
                 )
             except:
@@ -122,11 +90,9 @@ class Record:
         self.birthday = None
         self.phone = None
 
-    @handle_error
     def add_birthday(self, date):
         self.birthday = Birthday(date)
 
-    @handle_error
     def add_phone(self, phone):
         self.phone = Phone(phone)
 
@@ -137,15 +103,33 @@ class Record:
 
 
 class AddressBook(UserDict):
-    @handle_error
-    def add_record(self, record):
-        if record.name.value in self.data:
-            raise RecordAlreadyExistError
-        self.data[record.name.value] = record
-        return self.data[record.name.value]
+    def add_record(self, name, phone):
+        if name in self.data:
+            raise KeyError(f"The contact with this name '{name}' already exists.")
+        record = Record(name)
+        record.add_phone(phone)
+        self.data[name] = record
 
-    @handle_error
     def find(self, name):
-        if not self.data[name]:
-            raise RecordNotExistError
+        if not name in self.data:
+            raise KeyError(f"The contact with this name '{name}' does not exist.")
         return self.data[name]
+
+    def get_birthdays_per_week(self):
+        users = []
+        for name in self.keys():
+            if self[name].birthday != None:
+                users.append({"name": name, "birthday": self[name].birthday.value})
+
+        if len(users) == 0:
+            raise ValueError(f"No birthdays were found.")
+
+        birthdays = get_birthdays(users)
+
+        if len(birthdays) == 0:
+            raise ValueError(f"No birthdays for next week.")
+
+        result = ""
+        for day in sorted(birthdays):
+            result += f"{calendar.day_name[day]}: {", ".join(birthdays[day])}\n"
+        return result

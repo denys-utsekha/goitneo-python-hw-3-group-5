@@ -1,5 +1,16 @@
-from book import AddressBook, Record
-from get_birthdays import get_birthdays_per_week
+from address_book import AddressBook, Record
+
+
+def handle_error(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError as e:
+            return e
+        except KeyError as e:
+            return e
+
+    return inner
 
 
 def parse_input(user_input):
@@ -8,30 +19,27 @@ def parse_input(user_input):
     return cmd, *args
 
 
+@handle_error
 def add_contact(args, book):
     name, phone = args
-    new_contact = Record(name)
-    new_contact.add_phone(phone)
-    new_record = book.add_record(new_contact)
-    if new_record:
-        return "Contact added."
+    book.add_record(name, phone)
+    return "Contact added."
 
 
+@handle_error
 def change_contact(args, book):
     name, phone = args
-    contact = book.find(name)
-    if contact:
-        contact.add_phone(phone)
-        return "Contact changed."
+    book.find(name).add_phone(phone)
+    return "Contact changed."
 
 
+@handle_error
 def get_contact_phone(args, book):
     name = args[0]
-    contact = book.find(name)
-    if contact:
-        return book.find(name).phone
+    return book.find(name).phone
 
 
+@handle_error
 def get_all_contacts(book):
     result = ""
     for name in book.keys():
@@ -41,6 +49,7 @@ def get_all_contacts(book):
     return "The contact list is empty"
 
 
+@handle_error
 def add_birthday(args, book):
     name, date = args
     contact = book.find(name)
@@ -48,19 +57,19 @@ def add_birthday(args, book):
     return "Birthday added."
 
 
+@handle_error
 def show_birthday(args, book):
     name = args[0]
-    if not book.find(name) or book.find(name).birthday == None:
-        return "Birthday is not defined"
-    birthday = book.find(name).birthday.value
+    contact = book.find(name)
+    if contact.birthday == None:
+        raise ValueError(f"'{name}' birthday is not defined")
+    birthday = contact.birthday.value
     return f"{birthday.day}.{birthday.month}.{birthday.year}"
 
 
+@handle_error
 def get_birthdays(book):
-    data = []
-    for name in book.keys():
-        data.append({"name": name, "birthday": book[name].birthday.value})
-    get_birthdays_per_week(data)
+    print(book.get_birthdays_per_week())
 
 
 def main():

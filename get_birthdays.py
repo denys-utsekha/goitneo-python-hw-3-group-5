@@ -1,7 +1,6 @@
 from datetime import datetime
 from collections import defaultdict
 from enum import Enum
-import calendar
 
 
 class Weekdays(Enum):
@@ -17,7 +16,7 @@ class Weekdays(Enum):
 PERIOD = 7
 
 
-def get_birthdays_per_week(users):
+def get_birthdays(users):
     result = defaultdict(list)
     today = datetime.today().date()
 
@@ -47,5 +46,4 @@ def get_birthdays_per_week(users):
             else:
                 result[birthday_weekday].append(name)
 
-    for day in sorted(result):
-        print(f"{calendar.day_name[day]}: {", ".join(result[day])}")
+    return result
