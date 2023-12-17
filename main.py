@@ -69,7 +69,7 @@ def show_birthday(args, book):
 
 @handle_error
 def get_birthdays(book):
-    print(book.get_birthdays_per_week())
+    return book.get_birthdays_per_week()
 
 
 def main():

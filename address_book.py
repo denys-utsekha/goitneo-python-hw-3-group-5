@@ -144,4 +144,4 @@ class AddressBook(UserDict):
         result = ""
         for day in sorted(birthdays):
             result += f"{calendar.day_name[day]}: {", ".join(birthdays[day])}\n"
-        return result
+        return result[:-1]
