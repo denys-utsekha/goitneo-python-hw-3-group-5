@@ -73,31 +73,37 @@ def get_birthdays(book):
 
 
 def main():
-    book = AddressBook()
+    new_address_book = AddressBook()
+    restore_address_book = new_address_book.read_from_file()
+    address_book = (
+        restore_address_book if restore_address_book != None else new_address_book
+    )
+
     print("Welcome to the assistant bot!")
     while True:
         user_input = input("Enter a command: ")
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
+            address_book.save_to_file()
             print("Good bye!")
             break
         elif command == "hello":
             print("How can I help you?")
         elif command == "add":
-            print(add_contact(args, book))
+            print(add_contact(args, address_book))
         elif command == "change":
-            print(change_contact(args, book))
+            print(change_contact(args, address_book))
         elif command == "phone":
-            print(get_contact_phone(args, book))
+            print(get_contact_phone(args, address_book))
         elif command == "all":
-            print(get_all_contacts(book))
+            print(get_all_contacts(address_book))
         elif command == "add-birthday":
-            print(add_birthday(args, book))
+            print(add_birthday(args, address_book))
         elif command == "show-birthday":
-            print(show_birthday(args, book))
+            print(show_birthday(args, address_book))
         elif command == "birthdays":
-            print(get_birthdays(book))
+            print(get_birthdays(address_book))
         else:
             print("Invalid command.")
 

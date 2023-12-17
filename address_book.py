@@ -3,6 +3,7 @@ from datetime import datetime
 import re
 from get_birthdays import get_birthdays
 import calendar
+import pickle
 
 
 class Field:
@@ -114,6 +115,17 @@ class AddressBook(UserDict):
         if not name in self.data:
             raise KeyError(f"The contact with this name '{name}' does not exist.")
         return self.data[name]
+
+    def save_to_file(self):
+        with open("address_book.bin", "wb") as file:
+            pickle.dump(self, file)
+
+    def read_from_file(self):
+        try:
+            with open("address_book.bin", "rb") as file:
+                return pickle.load(file)
+        except:
+            return None
 
     def get_birthdays_per_week(self):
         users = []
